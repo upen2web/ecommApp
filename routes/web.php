@@ -27,3 +27,4 @@ Route::get('logout',[MainController::class, 'logout']);
 Route::post('addCart',[MainController::class, 'addToCart']);
 Route::get('deleteCartItem/{id}',[MainController::class, 'deleteCartItem']);
 Route::put('{id}/updateCart',[MainController::class, 'updateCart']);
+Route::get('checkout',[MainController::class, 'checkout']);

@@ -42,6 +42,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                $total=0;
+                                @endphp 
                                 @foreach ($cartItems as $item)
                                     
                                 <tr>
@@ -68,6 +71,9 @@
                                     <td class="cart__price">$ {{ $item->price * $item->quantity }}</td>
                                     <td class="cart__close"><a href="{{ URL::to('deleteCartItem/'.$item->id) }}"><i class="fa fa-close"></i></a></td>
                                 </tr>
+                                @php
+                                    $total+= ($item->price * $item->quantity); 
+                                @endphp
                                 @endforeach
 
                             </tbody>
@@ -97,10 +103,17 @@
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ 169.50</span></li>
-                            <li>Total <span>$ 169.50</span></li>
+                            <li>Subtotal <span>$ {{ $total }}</span></li>
+                            <li>Total <span>$ {{ $total }}</span></li>
                         </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <form action="{{ URL::to('checkout') }}">
+                            <input type="text" name="fullname" class="form-control mt-2" placeholder="Enter Name" id="" required>
+                            <input type="text" name="phone" class="form-control mt-2" placeholder="Enter Phone no." id="" required>
+                            <input type="text" name="address" class="form-control mt-2" placeholder="Enter Address" id="" required>
+                            <input type="hidden" name="bill" class="form-cocntrol" value="{{ $total }}">
+                            <input type="submit" name="checkout" class="primary-btn mt-2 btn-block" value="Proceed to checkout">
+                        </form>
+                        {{-- <a href="#" class="primary-btn">Proceed to checkout</a> --}}
                     </div>
                 </div>
             </div>

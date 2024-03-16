@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Products;
 use App\Models\Users;
 use Illuminate\Foundation\Auth\User;
@@ -28,9 +30,6 @@ class MainController extends Controller
         return view('shopping-cart',compact('cartItems'));
     }
 
-    public function checkout() {
-        return view('checkout');
-    }
 
     public function shop() {
         return view('shop');
@@ -131,5 +130,37 @@ class MainController extends Controller
         $item = Cart::where('id',$id)->first();
         $item->delete();
         return back()->with('success','Item is succesfully deleted');
+    }
+
+    public function checkout(Request $data) 
+    {
+        if (session()->has('id')) 
+        {
+            $order = new Order();
+            $order->status = "Pending";
+            $order->customerId = $data->session()->get('id');
+            $order->bill = $data->bill;
+            $order->address = $data->address;
+            $order->fullname = $data->fullname;
+            $order->phone = $data->phone;
+            if($order->save()) {
+                $cart = Cart::where('customerId',session()->get('id'))->get();
+
+                foreach($cart as $item) {
+                    $product = Products::find($item->productId);
+                    $orderItem = new OrderItem();
+                    $orderItem->productId = $item->productId;
+                    $orderItem->quantity = $item->quantity;
+                    $orderItem->price = $product->price;
+                    $orderItem->orderId = $order->id;
+                    $orderItem->save();
+                    $item->delete();
+                }
+            }
+            return redirect()->back()->withSuccess('Your Item has been placed successfully!');
+        }
+        else {
+            return back('login')->withErrors('Alert!! Please Login Account');
+        }
     }
 }
